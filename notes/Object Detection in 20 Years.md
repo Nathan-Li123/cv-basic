@@ -1,5 +1,7 @@
 # Object Detection in 20 Years 
 
+*论文位置 : ../resources/papers/Object Detection in 20 Years.pdf*
+
 ### 一、目标检测发展过程
 
 *以下算法都是具有里程碑意义的*

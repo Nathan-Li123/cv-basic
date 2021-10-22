@@ -40,7 +40,7 @@ Hinge损失函数标准形式如下：
 
 <img src="https://www.zhihu.com/equation?tex=L%28y%2C+f%28x%29%29+%3D+max%280%2C+1-yf%28x%29%29+++%5C%5C" alt="[公式]" style="zoom:80%;" />
 
-hinge损失函数表示如果被分类正确，损失为0，否则损失就为 ![[公式]](https://www.zhihu.com/equation?tex=1-yf%28x%29) 。SVM分类器就是使用这个损失函数，健壮性不错但是对异常点和噪音不太敏感。hinge损失函数还有一种变体称为感知损失函数。在感知损失函数中，分类正确时损失为，分类不正确损失为负的预测值，他对判定边界附近的点非常严格。
+hinge损失函数表示如果被分类正确，损失为0，否则损失就为 ![公式](https://www.zhihu.com/equation?tex=1-yf%28x%29) 。SVM分类器就是使用这个损失函数，健壮性不错但是对异常点和噪音不太敏感。hinge损失函数还有一种变体称为感知损失函数。在感知损失函数中，分类正确时损失为，分类不正确损失为负的预测值，他对判定边界附近的点非常严格。
 
 ##### Smooth L1 损失
 
@@ -63,7 +63,7 @@ smooth L1说的是光滑之后的L1（绝对值平均损失），L1损失的缺�
 
 ##### 梯度下降
 
-梯度下降算法背后的原理：目标函数 ![[公式]](https://www.zhihu.com/equation?tex=J%28%5Ctheta%29) 关于参数 ![[公式]](https://www.zhihu.com/equation?tex=%5Ctheta) 的梯度将是损失函数（loss function）上升最快的方向。而我们要最小化loss，只需要将参数沿着梯度相反的方向前进一个步长，就可以实现目标函数（loss function）的下降。这个步长 ![[公式]](https://www.zhihu.com/equation?tex=%5Ceta) 又称为学习速率。也就是说最基础的参数的更新公式为：
+梯度下降算法背后的原理：目标函数 ![公式](https://www.zhihu.com/equation?tex=J%28%5Ctheta%29) 关于参数 ![公式](https://www.zhihu.com/equation?tex=%5Ctheta) 的梯度将是损失函数（loss function）上升最快的方向。而我们要最小化loss，只需要将参数沿着梯度相反的方向前进一个步长，就可以实现目标函数（loss function）的下降。这个步长 ![[公式]](https://www.zhihu.com/equation?tex=%5Ceta) 又称为学习速率。也就是说最基础的参数的更新公式为：
 
 ![公式](https://www.zhihu.com/equation?tex=%5Ctheta%5Cleftarrow+%5Ctheta-%5Ceta+%5Ccdot+%5Cnabla+J%28%5Ctheta%29)
 
@@ -155,7 +155,7 @@ Adaptive moment estimation (Adam)算法类似于Momentum和RMSprop的结合：
 
 这里的蓝色矩阵就是输入的图像，粉色矩阵就是卷积层的神经元，这里表示了有两个神经元（w0,w1）。绿色矩阵就是经过卷积运算后的输出矩阵，这里的步长设置为2。该实例中输入矩阵为7×7×3，滤波器为3×3×3，而输出矩阵为3×3×2，滑动窗口每移动一个步长，**计算三层的窗口矩阵与滤波器矩阵对应位相乘再相加，最后加上偏置值得到一个输出**（例如图中就是 0 + (-2-2) + 0 + 1 = -3 ）的计算，最终得到3×3的矩阵，因为有两个滤波器所以输出矩阵层数为2。
 
-<img src="E:\李云昊\国科\computer-vision\notes\img\单层卷积网络.jpg" alt="单层卷积网络"  />
+<img src=".\img\单层卷积网络.jpg" alt="单层卷积网络"  />
 
 ##### 参数共享机制
 

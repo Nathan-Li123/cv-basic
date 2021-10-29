@@ -16,11 +16,11 @@ model.eval()
 
 整体效果流程如下，首先传入一张照片：
 
-<img src="E:/李云昊/国科/computer-vision/notes/img/input.jpg" style="zoom:70%;" />
+<img src="./img/input.jpg" style="zoom:70%;" />
 
 由于PyTorch自带的Faster R-CNN是用MS COCO数据集训练的，因此他分类也是按照MS COCO的设定进行分类。经过代码运行最终得到的结果如下：
 
-<img src="E:/李云昊/国科/computer-vision/notes/img/output.png" style="zoom: 60%;" />
+<img src="./img/output.png" style="zoom: 60%;" />
 
 可以看到图片中标上了很多bbox，这个结果是为所有检测分数大于0.5的对象标上了bbox，可以说定位还是相当准确的，并且识别出的对象也非常多。
 

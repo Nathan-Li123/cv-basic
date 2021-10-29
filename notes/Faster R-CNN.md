@@ -131,7 +131,7 @@ Faster R-CNN 的分类网络其实就是 Fast R-CNN，首先讨论三种方式�
 
 ##### cls 网络
 
-一副M×N大小的矩阵送入 Faster R-CNN 网络后，经过滑动窗口（活动输出过程见[3.1的第一段](####3.1 Region Proposal Networks)）之后到RPN网络变为 (M/16)× (N/16)，不妨设 W=M/16，H=N/16。
+一副M×N大小的矩阵送入 Faster R-CNN 网络后，经过 backbone之后到RPN网络变为 (M/16)× (N/16)，不妨设 W=M/16，H=N/16，首先进行一个滑动窗口的活动（活动输出过程见[3.1的第一段](####3.1 Region Proposal Networks)），注意这个滑动窗口输入和输出矩阵形状是不变的。
 
 然后做了1×1的卷积操作，使得输出通道数为18。这也就刚好对应了feature maps每一个点都有9个anchors，同时每个anchors又有可能是positive和negative，所有这些信息都保存W×H×(9*2)大小的矩阵。
 
@@ -163,7 +163,7 @@ Faster R-CNN 的分类网络其实就是 Fast R-CNN，首先讨论三种方式�
 
 而RoI Pooling层则负责收集proposal，并计算出proposal feature maps，送入后续网络。从整体结构图可以看到 RoI pooling层有2个输入：原始的feature maps和RPN输出的proposals。 
 
-关于RoI的必要性和过程见上文的[RoI pooling 部分](#####RoI pooling)。
+关于RoI的必要性和过程见上文的 [RoI pooling 部分](#####RoI pooling)。
 
 ##### 分类器
 
@@ -219,23 +219,13 @@ box 的坐标一般用（x，y，w，h）表示，分别代表中心坐标、宽
 
 其中的星号就是x，y，w，h中的一个。到这里就清晰了，我们要做的就是调整参数，也就是上面公式中的W，使我们的预测值 d 和 真实的偏差值 t 尽可能地接近，这里就需要用到损失函数了。
 
-### 七、Q&A
+##### anchor free 和 anchor based
 
-1. Q： proposal 阶段放到GPU上会忽略下游检测网络，从而错过了共享计算的重要机会。为什么？
+这是目标检测算法的一种分类方式（可类比One-Stage和Two-Stage分类），区别就在于**有没有利用anchor提取候选目标框**。anchor based 的典型算法有 Faster R-CNN、SSD、YOLO等，anchor-free类算法代表是CornerNet、ExtremeNet、CenterNet、FCOS等。
 
-2. Q：为啥cls层需要输出是或不是某种类别的两个评分？
+### 七、PyTorch 实现
 
-3. Q：这个[图像边界](###3.3 实现细节)是指每个小滑动窗口的边界还是整个图像的边界？
-
-   A：就是字面意义上的整个图像的边界。
-
-4. Q：特征矩阵经过proposal层之后是不是有关于positive和negative的评分就被丢弃了？
-
-5. Q：[im_info](######im_info)是干嘛用的？
-
-
-
-
+关于使用PyTorch实现Faster R-CNN另写了一篇记录，详见[Faster R-CNN实现](./PyTorch Faster R-CNN.md)。
 
 
 

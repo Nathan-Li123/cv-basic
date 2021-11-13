@@ -4,7 +4,7 @@
 
 ### 一、YOLO V3
 
-论文地址：./resources/papers/YOLOv3 An Incremental Improvement.pdf 或 [论文链接](https://arxiv.org/abs/1804.02767)
+论文地址：../resources/papers/YOLOv3 An Incremental Improvement.pdf 或 [论文链接](https://arxiv.org/abs/1804.02767)
 
 #### 1.1 简介
 
@@ -34,9 +34,13 @@ YOLOv3的特征提取网络结合之前的Darknet-19和当时流行的残差网�
 
 可以看到YOLOv3总共输出3个特征图，第一个特征图下采样32倍，第二个特征图下采样16倍，第三个下采样8倍。输入图像经过Darknet-53（无全连接层），再经过Yoloblock生成的特征图被当作两用，第一用为经过3*3卷积层、1*1卷积之后生成特征图一，第二用为经过1*1卷积层加上采样层，与Darnet-53网络的中间层输出结果进行拼接，产生特征图二。同样的循环之后产生特征图三。
 
+#### 1.3 代码
+
+GitHub项目[PyTorch-YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3)，环境配置直接跟着项目中的README文档走即可，需要使用poetry包管理工具。
+
 ### 二、SSD
 
-论文地址：./reousrces/papers/SSD Single Shot MultiBox Detector.pdf 或 [论文链接](https://arxiv.org/abs/1512.02325)
+论文地址：../reousrces/papers/SSD Single Shot MultiBox Detector.pdf 或 [论文链接](https://arxiv.org/abs/1512.02325)
 
 #### 2.1 简介
 
@@ -102,7 +106,7 @@ SSD在每个feature map上都可以选择不同的default box，下面假设共�
 
 ### 三、Mask R-CNN
 
-论文地址：./resources/papers/Mask R-CNN.pdf 或 [论文链接](https://arxiv.org/abs/1703.06870)
+论文地址：../resources/papers/Mask R-CNN.pdf 或 [论文链接](https://arxiv.org/abs/1703.06870)
 
 #### 3.1 简介
 
@@ -142,7 +146,7 @@ Mask R-CNN 框架很容易被扩展应用到**人体姿态估计**中去，通�
 
 ### 四、RFCN
 
-论文地址：./resources/papers/R-FCN Object Detection via Region-based Fully Convolutional Networks.pdf 或 [论文链接](https://arxiv.org/abs/1605.06409)
+论文地址：../resources/papers/R-FCN Object Detection via Region-based Fully Convolutional Networks.pdf 或 [论文链接](https://arxiv.org/abs/1605.06409)
 
 *ps：这篇论文的模型介绍部分真心不好理解，因此参考了文章[详解 R-FCN](https://zhuanlan.zhihu.com/p/30867916)*
 
@@ -192,7 +196,7 @@ R-FCN的训练是简单的端对端训练。每个RoI损失是分类的交叉熵
 
 ### 五、Cascade R-CNN
 
-论文地址：./resources/papers/Cascade R-CNN Delving into High Quality Object Detection.pdf 或 [论文链接](https://arxiv.org/abs/1712.00726)
+论文地址：../resources/papers/Cascade R-CNN Delving into High Quality Object Detection.pdf 或 [论文链接](https://arxiv.org/abs/1712.00726)
 
 #### 5.1 简介
 
@@ -208,7 +212,7 @@ Cascade R-CNN就是为了解决这些问题而提出的，它包含**一些使�
 
 ### 六、Retina Net
 
-论文地址：./resources/papers/Focal Loss for Dense Object Detection.pdf 或 [论文链接](https://arxiv.org/abs/1708.02002)
+论文地址：../resources/papers/Focal Loss for Dense Object Detection.pdf 或 [论文链接](https://arxiv.org/abs/1708.02002)
 
 #### 6.1 简介
 
@@ -268,11 +272,109 @@ bbox回归子网和分类子网的架构基本相同，只不过最后输出的�
 
 ### 七、Center Net
 
-论文地址：./reources/papers/Objects as Points.pdf 或 [论文链接](https://arxiv.org/abs/1904.07850)
+论文地址：../reources/papers/Objects as Points.pdf 或 [论文链接](https://arxiv.org/abs/1904.07850)
+
+参考链接：[扔掉anchor！真正的CenterNet——Objects as Points论文解读](https://zhuanlan.zhihu.com/p/66048276)
 
 #### 7.1 简介
 
+目前检测器检测对象的方法是构造一个紧贴着目标对象、坐标轴对齐的bbox，然后对框内对象进行分类识别。而原文提出了一种新的简单的检测器，它用bbox的中心点来表示一个物体，然后在中心点位置回归出目标的一些属性，例如：size, dimension, 3D extent, orientation, pose。 而**目标检测问题变成了一个标准的关键点估计问题**。我们仅仅将图像传入全卷积网络，得到一个热力图，热力图峰值点即中心点，每个特征图的峰值点位置预测了目标的宽高信息。
 
+除此之外原文还对模型做了一些拓展：对于3D BBox检测，我们直接回归得到目标的深度信息，3D框的尺寸，目标朝向；对于人姿态估计，我们将关节点（2D joint）位置作为中心点的偏移量，直接在中心点位置回归出这些偏移量的值。
+
+Center Net 的那个center point比较类似anchor，但是有几点不同：一是center point只基于位置，和box overlap无关；二是对于每一个位置都只取一个点；三是Center Net输出的heatmap分别率较高（输出步长为4，而一般的检测器输出步长为16）。
+
+***Center Net 主要思想不是一个检测器，而是一个检测模型或者说一个检测思路（一种表示对象的方式），它在one-stage和two-stage的检测器上都可以应用。***
+
+#### 7.2 CenterNet 实现
+
+##### 关键点估计
+
+首先设 I 为输入图像（宽为W，高为H，通道数为3），我们的目标是生成**热力图 Y** ，热力图尺寸为 W/R × H/R × C，其中R是输出步长（也就是上文提到的通常取4），C是关键点类别数（就是目标类别数）。热力图取值范围为0或1，1代表是当前坐标检测到了这种类别的物体，0则代表不存在。原文使用三种全卷积网络实现热力图预测：Resnet-18 with up-convolutional layers、DLA-34 、Hourglass-104。对于 每个Ground Truth某一类的关键点 c ,其位置为p ，计算得到低分辨率（经过下采样)上对应的关键点，我们将 GT 关键点通过高斯核分散到热力图上。如果有两个关键点重合（同类别），我们取元素级较高的那个（应该就是取高斯核计算出来更大的那个）。有关于高斯分布到热力图上这么说可能不是很好理解，那么直接看一个官方源码中生成的一个高斯分布[9,9]：
+
+<img src="E:\李云昊\国科\computer-vision\notes\img\高斯分布.jpg" style="zoom:67%;" />
+
+##### 损失函数
+
+###### 中心点预测损失
+
+训练时关于中心点预测使用像素级的focal loss：
+
+![](.\img\Center Point 损失函数.jpg)
+
+其中α和β是focal loss的超参，N是图像中的关键点数量。关于是中心点的损失函数很好理解，而不是中心点就稍显复杂。观察在otherwise条件下的表达式， 预测值越大（预测错了他还很肯定，说明是难例）则损失权重也越大，而另一项 <img src="https://www.zhihu.com/equation?tex=%281-%7BY%7D_%7Bx+y+c%7D%29%5E%7B%5Cbeta%7D" alt="[公式]" style="zoom: 67%;" />则是对中心点周围点做出了调整，因为靠得越近的点越容易干扰到实际中心点。同时这个也起到了处理正负样本不均衡的作用，在这里每一个物体只有一个实际中心点，其余的都是负样本，但是负样本相较于一个中心点显得有很多。
+
+###### 目标中心偏移损失
+
+因为上文中对图像进行了的下采样，这样的特征图重新映射到原始图像上的时候会带来精度误差，因此原文还为每一个center point添加了一个偏移量 O（所有类的偏移量相同)，注意 O 和热力图同样长宽但是通道数为2。偏移量训练使用L1损失，它只在关键点位置上作监督操作，其他位置无视。
+
+###### 目标大小预测损失
+
+此外还需要为每个目标k回归出目标的尺寸，为了减少计算负担，原文对每个目标种类使用单一的尺寸预测 S，S的尺寸和之前提到的偏移量 O 相同。关于S的回归原文也使用了L1损失。
+
+###### 总体损失
+
+我们不将scale进行归一化，直接使用原始像素坐标。为了调节该loss的影响，将其乘了个系数，整个训练的目标loss函数为：
+
+![](.\img\Center Net 完整损失函数.jpg)
+
+原文使用同一个网络来预测 Y、O 和 S，也就是说这个网络在每个位置上输出C+4个值，所有输出共享一个全卷积的backbone。
+
+##### 测试
+
+在测试时，我们首先提取热力图在每一类上的峰值，做法是将热力图上的所有响应点与其连接的8个临近点进行比较，如果该点响应值大于或等于其八个临近点值则保留，最后我们保留所有满足之前要求的前100个峰值点。对于每一个检测到的中心点，产生如下bbox：
+
+![img](https://img-blog.csdnimg.cn/20190417200330996.png)
+
+其中![img](https://img-blog.csdnimg.cn/20190417200406600.png)是偏移预测结果；![img](https://img-blog.csdnimg.cn/20190417200429484.png)是尺度预测结果。
+
+##### 3D检测
+
+ 3D检测是对每个目标进行3维bbox估计，每个中心点需要3个附加信息：**depth, 3D dimension， orientation**。我们为每个信息分别添加head。
+
+##### 人体姿态估计
+
+人的姿态估计旨在估计图像中每个人的k 个2D人的关节点位置（在COCO中，k是17，即每个人有17个关键点）。因此，原文令中心点的姿态是 kx2 维的，然后将每个关键点（关节点对应的点）参数化为相对于中心点的偏移。
+
+### 八、FCOS
+
+论文地址：../resources/papers/FCOS Fully Convolutional One-Stage Object Detection.pdf 或 [论文链接](https://arxiv.org/abs/1904.01355)
+
+#### 8.1 简介
+
+FCOS全称fully convolutional one-stage object detector，它是一种不使用anchor的检测器（和Center Net的目的一样是不使用anchor），这样不仅减少了有关anchor的计算量，还不需要考虑那些anchor相关的超参。
+
+#### 8.2 FCOS 实现
+
+![](.\img\FCOS.jpg)
+
+##### Fully Convolutional One-Stage Object Detector
+
+*这一部分是FCOS最简单架构，它只包含上图的backbone和head中不包括Center-ness分支的部分。*
+
+FCOS在特征图上的每一个点进行回归操作。首先，我们可以将feature_map中的每一个点(x,y)映射回原始的输入图片中；然后，如果这个映射回原始输入的点在相应的GT的BB范围之内，而且类别标签对应，我们将其作为训练的正样本块，否则将其作为负样本；接着，我们回归的目标是(l,t,r,b)，即中心点做BB的left、top、right和bottom之间的距离（其主要原因是为了后续使用center-ness做准备的）。FCOS使用的方法是在特征图后为分类和回归分别添加四个全卷积层，最终网络输出一个C维（这个C是类别数，在COCO数据集中为80）的分类标签和4维的bbox坐标。
+
+由于FCOS算法是基于目标物体框中的点进行逐像素回归的，因此执行回归的目标都是正样本，所以作者使用了**exp()函数将回归目标进行拉伸**，此操作是为了最终的特征空间更大，辨识度更强。 FCOS训练的损失函数如下图所示：
+
+<img src=".\img\FCOS损失函数.jpg" style="zoom:80%;" />
+
+其中分类损失使用focal loss，回归损失使用UnitBox中提出的IoU损失。
+
+##### 多尺度策略
+
+使用FPN的策略，FCOS在不同层级的特征图上检测不同尺寸的目标，如上面的整体架构图所示，有三层是由backbone的卷积神经网络产生的，并且自顶而下连接，而另外两层则是以步长为2的下采样得到的。依据这种策略，FCOS在每一个层级的每一个像素上都进行如下操作：计算当前层级中的回归目标 l、t、r、b，判断max(l, t, r, b) > mi 或者 max(l, t, r, b) < mi -1是否满足。若满足，则**不对此边界框进行回归预测**，其中mi是作为当前尺度特征层的最大回归距离。也就是说每一层只需要回归一定尺寸的目标的像素，如果依然出现重复现象。那么就直接选择小的区域作为回归目标。
+
+还有一点值得注意的是作者认为不同的特征层需要回归不同的尺寸范围，因此在不同的特征层使用相同的输出激活是不合理的。因此，作者没有使用标准的exp(x)函数，而是使用exp(si，x)其中si是一个可训练的标量si，能够通过si来自动调整不同层级特征的指数函数的基数。
+
+##### Center-ness 分支
+
+通过上述两节的方法构成的检测器和一般的anchor-based检测器精度上依然有差距，这是因为按照上文方式会产生很多由那些里目标对象中心很远的像素点产生的低质量的bbox，而Center-ness分支的提出就是为了解决这个问题。如上图所示，这个分支是一个单层分支，和分类分支并行来预测位置的Center-ness，也就是**该像素到对应目标中心的归一化距离**，其计算公式如下：
+
+<img src=".\img\centerness.jpg" style="zoom:80%;" />
+
+center-ness取值为0到1，训练时的损失函数为二值交叉熵损失，这一项损失也要加到上文提到的损失函数中去。在测试时，最终的得分是那一个像素的分类得分和center-ness的乘积，这样离中心远的像素的得分就会比较低，更有可能在之后的NMS中被去掉。关于这个还有一种可选方案是只选择中心点作为正样本，代价是要多一个超参。值得注意的一点是虽然看起来center-ness的计算好像可一个回归分支放在一起，但实验表明这样做效果不好。
+
+*FCOS的思想在two-stage检测器中也可以使用，它能够用来代替RPN中的anchors*
 
 ### Notes
 

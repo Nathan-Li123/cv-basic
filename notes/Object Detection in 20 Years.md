@@ -30,11 +30,13 @@ RCNN - SPPNet - Fast RCNN - Faster RCNN - FPN
 
 采用了Region Proposal Network (RPN) ，区域建议网络，它提供了几乎是cost-free的region proposal（区域建议？）。Faster RCNN 将检测系统中大部分的独立模块，比如 proposal detection、特征提取、边界框回归等结合到一个端对端的学习框架中。
 
-具体学习见[Faster R-CNN](./Faster R-CNN.md)
+具体学习见[Faster R-CNN笔记](./Faster R-CNN.md)
 
 ##### Feature Pyramid Networks
 
 在FPN之前，大多数基于深度学习的检测器只在网络的顶层进行检测。虽然CNN较深层的特征有利于分类识别，但不利于对象的定位。为此，开发了具有横向连接的自顶向下体系结构，用于在所有级别构建高级语义。
+
+具体学习笔记见[FPN笔记](./FPN for Object Detection.md)
 
 ***One-stage算法一步到位，直接定位目标，速度更快，Two-stage算法生成候选框然后分类、修正，最后得出结论，精准度高但慢一些***
 

@@ -16,13 +16,11 @@ transformer模型最早是在自然语言处理领域提出的，论文链接：
 
 <img src=".\img\transformer01.jpg" style="zoom:70%;" />
 
-##### encoder
+##### encoder & decoder
 
-encoder由六个相同的层组成，而每一层又有两个子层，如上图左侧的那个标着N×的模块所示，第一个子层是一个multi-head的self-attention机制，而第二子层则是一个简单的前馈全链接层，同时对于每个子层前后还使用了残差网络和归一化。为确保连接，所有的层输出维度都是512。
+首先了解一下encoder-decoder框架，这个框架之前最经典的是使用RNN实现的。编码阶段由编码器将输入序列转化为一个固定维度的稠密向量，解码阶段由解码器将这个激活状态生成目标译文。通俗的讲，我们大脑读入的过程叫做Encoder，即将输入的东西变成我们自己的记忆，放在大脑当中，而这个记忆可以叫做Context，然后我们再根据这个Context，转化成答案写下来，这个写的过程叫做Decoder。其实就是编码-存储-解码的过程。
 
-##### decoder
-
-decoder也是六层，如上图右侧模块所示，它每一层包含三个子层，第一层是一个Masked multi-head self-attention，而后两层和encoder中的两个子层一样，并且和encoder一样应用了残差网络和归一化。其输入输出和解码过程如下：
+然后再看Transformer的encoder-decoder，encoder由六个相同的层组成，而每一层又有两个子层，如上图左侧的那个标着N×的模块所示，第一个子层是一个multi-head的self-attention机制，而第二子层则是一个简单的前馈全链接层，同时对于每个子层前后还使用了残差网络和归一化。为确保连接，所有的层输出维度都是512。decoder也是六层，如上图右侧模块所示，它每一层包含三个子层，第一层是一个Masked multi-head self-attention，而后两层和encoder中的两个子层一样，并且和encoder一样应用了残差网络和归一化。其输入输出和解码过程如下：
 
 - 输出：对应i位置的输出词的概率分布
 - 输入：encoder的输出和对应i-1位置decoder的输出。所以中间的attention不是self-attention，它的K，V来自encoder，Q来自上一位置decoder的输出
@@ -182,13 +180,13 @@ DETR每次预测预测固定的N个预测值，N是提前设定的并且显著�
 
 输入图像尺寸为 H0 × W0 × 3，最终生成一个2048 × H0/32 × W0/32 的低分辨率特征图（不是一定是这个尺寸，不过一般典型的都是这个尺寸）。原文这里使用了activation map而不是feature map，不过应该没啥区别。
 
-###### Transformer encoder
+###### encoder & encoder
 
-首先。一个1×1的卷积层把之前C个通道（就是那个典型为2048）的特征图通道数转化为d，然后因为encoder期望输入是一个序列，还要将新的 d × W × H 的特征图压成 d × WH。之后就是标准的Transformer结构，由多层的multi-head self-attention module 和 feed forward network (FFN)组成。由于transformer对排列顺序不敏感，所以作者还加入了位置的编码，并添加到所有attention层的输入。
+首先，一个1×1的卷积层把之前C个通道（就是那个典型为2048）的特征图通道数转化为d，然后因为encoder期望输入是一个序列，还要将新的 d × W × H 的特征图压成 d × WH。之后就是标准的Transformer结构，由多层的multi-head self-attention module 和 feed forward network (FFN)组成。由于transformer对排列顺序不敏感，所以作者还加入了位置的编码，并添加到所有attention层的输入。
 
-###### Transformer decoder
+DETR Decoder的结构也与Transformer类似，每个Decoder有两个输入：一个是Object Query（或者是上一个Decoder的输出），另一个是Encoder的结果，区别在于这里是并行解码N个object。与原始的transformer不同的地方在于decoder每一层都输出结果，计算loss。另外一个与Transformer不同的地方是，DETR的Decoder和encoder一样也加入了可学习的positional embedding，其功能类似于anchor。最后一个Decoder后面接了两个FFN，分别预测检测框及其类别。
 
-这里的decoder结构和标准的Transformer decoder相同，不过它是在每一层上同时计算N个对象的。由于decoder也是对排列顺序不敏感，这N个嵌入必须不一样，才能预测不同的结果。这些输入的嵌入是学到的位置编码，我们称之为object queries，类似于encoder，我们把它们加到每个decoder的输入。
+*关于这个object queries原文的解释是a small fixed number of learned positional embeddings*
 
 ###### FFNs
 
